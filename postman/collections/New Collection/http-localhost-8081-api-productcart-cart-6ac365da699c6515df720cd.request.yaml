@@ -1,0 +1,13 @@
+$kind: http-request
+name: http://localhost:8081/api/productcart/cart/6ac365da699c6515df720cd2
+description: ""
+url: http://localhost:8081/api/productcart/cart/6ac365da699c6515df720cd2
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \  \"desc\": \"Extra crispy zinger burger with cheese and spicy mayo\"\r
+
+    }"
+order: 4502475100952756

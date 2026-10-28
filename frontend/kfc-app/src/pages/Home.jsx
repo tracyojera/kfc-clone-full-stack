@@ -8,6 +8,7 @@ import styles from "./Home.module.css";
 import QuickBites from "../home_components/QuickBites";
 import Favorites from "../home_components/Favorites";
 import Featured from "../home_components/Featured";
+import { useFallbackImage } from "../utils/imageFallback";
 
 const mainSlider = {
   infinite: true,
@@ -252,8 +253,9 @@ const Home = () => {
             <div className={styles.videoBanner}>
               <div className={styles.videoBanner__fig}>
                 <img
-                  src="https://digitaleat.kfc.com/menus/image/bare/kfc-IndFries?q=75"
+                 src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=900&q=85"
                   alt="KFC Fries"
+                 onError={useFallbackImage}
                 />
               </div>
               <div className={styles.videoBanner__cta}>

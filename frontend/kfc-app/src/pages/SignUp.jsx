@@ -25,28 +25,36 @@ const SignUp = () => {
 
   async function registerUser(event) {
     event.preventDefault();
-    const response = await fetch("https://kfcapi.herokuapp.com/Auth/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        firstname,
-        lastname,
-        email,
-        password,
-      }),
-    });
-    const data = await response.json();
-    if (data) {
-      // notify();
-      alert("Account Created Successfully");
-      const timer = setTimeout(() => {
-        navigate("/api/Auth/login");
-      }, 2000);
-      return () => clearTimeout(timer);
+
+    try {
+      const response = await fetch("http://localhost:8081/Auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstname,
+          lastname,
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.status === "OK") {
+        alert(data.message || "Account Created Successfully");
+        const timer = setTimeout(() => {
+          navigate("/api/Auth/login");
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
+
+      alert(data.message || "Unable to create account");
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert("Unable to create account right now. Please try again.");
     }
-    console.log("data:", data);
   }
   return (
     <>

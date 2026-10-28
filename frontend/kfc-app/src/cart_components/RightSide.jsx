@@ -3,22 +3,24 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from "axios";
+import { formatUGX, getPriceAmount, getSafeQuantity } from "../utils/currency";
 import "../pages/Cart.css"
 
 const RightSide = () => {
     const [input, setInput] = useState(false);
     const [stotal,setstotal]= useState(0);
+    const [paymentMessage, setPaymentMessage] = useState("");
+    const [isPaying, setIsPaying] = useState(false);
     const cart= useSelector((state)=>state.cart)
     const navigate= useNavigate();
     const location = useLocation();
-    console.log(location.pathname)
-    let path= location.pathname;
+    const path = location.pathname;
 
     useEffect(()=>{
       let total= cart.reduce((acc,el)=>{
-        let price= el.price.substring(1);
-        price=Number(price);  
-        return Math.round(price*el.qty+acc);
+        const price = getPriceAmount(el.price);
+        const quantity = getSafeQuantity(el.qty);
+        return Math.round(price * quantity + acc);
     },0)
     setstotal(total)
     },[cart])
@@ -27,39 +29,23 @@ const RightSide = () => {
       setInput(!input);
     };
     
-    const initPayment = (data) => {
-      const options = {
-        key: "",
-        amount: data.amount,
-        currency: data.currency,
-        name: "Kentucky Fried Chicken",
-        description: "You Total Amount",
-        order_id: data.id,
-        handler: async (response) => {
-          try {
-            const verifyURL = "https://kfcapi.herokuapp.com/api/payment/verify";
-            const { data } = await axios.post(verifyURL, response);
-            console.log("data:", data);
-          } catch (err) {
-            console.log("err:", err);
-          }
-        },
-        theme: {
-          color: "#a50000",
-        },
-      };
-      const rzp1 = new window.Razorpay(options);
-      rzp1.open();
-    };
-
     const handlePayment = async () => {
+      setPaymentMessage("");
+      setIsPaying(true);
+
       try {
-        const orderURL = "https://kfcapi.herokuapp.com/api/payment/orders";
-        const { data } = await axios.post(orderURL, { amount: stotal });
-        console.log("data:", data);
-        initPayment(data.data);
-      } catch (err) {
-        console.log("err:", err);
+        const amount = stotal + (input ? 5 : 0);
+        const { data } = await axios.post(
+          "http://localhost:8081/api/payment/pay",
+          { amount }
+        );
+        setPaymentMessage(`${data.message}. Payment ID: ${data.paymentId}`);
+      } catch (error) {
+        setPaymentMessage(
+          error.response?.data?.message || "Unable to process demo payment."
+        );
+      } finally {
+        setIsPaying(false);
       }
     };
     
@@ -82,7 +68,7 @@ const RightSide = () => {
             }}
           >
             <div>SubTotal</div>
-            <div>₹{stotal}</div>
+            <div>{formatUGX(stotal)}</div>
           </div>
           <div
             style={{
@@ -92,7 +78,7 @@ const RightSide = () => {
             }}
           >
             <div>GST</div>
-            <div>₹{stotal}</div>
+            <div>{formatUGX(stotal)}</div>
           </div>
           <div
             style={{
@@ -104,7 +90,7 @@ const RightSide = () => {
             <div style={{ marginRight: "20px" }}>
               Restaurant Handling (Incl. Taxes)
             </div>
-            <div>₹{stotal}</div>
+            <div>{formatUGX(stotal)}</div>
           </div>
           {input ? (
             <div
@@ -115,7 +101,7 @@ const RightSide = () => {
               }}
             >
               <div style={{ marginRight: "20px" }}>Add Hope</div>
-              <div>₹5</div>
+              <div>{formatUGX(5)}</div>
             </div>
           ) : (
             ""
@@ -129,7 +115,7 @@ const RightSide = () => {
               <input onInput={handleInput} type="checkbox" />
             </div>
             <div style={{ marginTop: "-17px" }}>
-              <p>Donate ₹5.00 Tick to Add Hope.</p>
+              <p>Donate UGX 5 Tick to Add Hope.</p>
               <p>Our goal is to feed 20 million people by 2022.</p>
             </div>
             <div>
@@ -139,17 +125,18 @@ const RightSide = () => {
               />
             </div>
           </div>
-          {path=="/cart"?(   <button onClick={()=>navigate("/checkout")} className="redButton">
+          {path === "/cart" ? (   <button onClick={()=>navigate("/checkout")} className="redButton">
             <div style={{ display: "flex", justifyContent: "space-around" }}>
               <p>Checkout</p>
-              <p>₹{!input?stotal:stotal+5}</p>
+              <p>{formatUGX(!input ? stotal : stotal + 5)}</p>
             </div>
-          </button>):(   <button onClick={handlePayment} className="redButton">
+          </button>):(   <button onClick={handlePayment} className="redButton" disabled={isPaying}>
             <div style={{ display: "flex", justifyContent: "space-around" }}>
-              <p>Payment</p>
-              <p>₹{!input?stotal:stotal+5}</p>
+              <p>{isPaying ? "Processing..." : "Payment"}</p>
+              <p>{formatUGX(!input ? stotal : stotal + 5)}</p>
             </div>
           </button>)}
+          {paymentMessage && <p role="status">{paymentMessage}</p>}
        
     </>
   )

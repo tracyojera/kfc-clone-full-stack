@@ -11,20 +11,17 @@ const cors = require("cors");
 const helmet = require("helmet");
 
 const server = express();
+const PORT = process.env.PORT || 8081;
 
 server.use(express.urlencoded({ extended: true }));
 server.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", "http://localhost:3001"],
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 server.use(helmet());
 server.use(express.json());
-
-server.get("/", (req, res) => {
-  res.send(`KFC API Server started on localhost:${PORT}`);
-});
 
 server.use("/Auth", userAuthRouter);
 server.use("/api/home", landingRouter);
@@ -33,10 +30,20 @@ server.use("/api/product", menuRouter);
 server.use("/api/productcart", cartRouter);
 server.use("/api/payment", paymentRouter);
 
-const PORT = process.env.PORT || 8080;
+server.get("/", (req, res) => {
+  res.send(`KFC API Server started on localhost:${PORT}`);
+});
 
-server.listen(PORT, async () => {
+async function startServer() {
   await connection;
   console.log("Connected to Database");
-  console.log(`🌎 started on http://localhost:${PORT}/`);
+  server.listen(PORT, () => {
+    console.log(`🌎 started on http://localhost:${PORT}/`);
+  });
+}
+
+startServer().catch((error) => {
+  console.error("Failed to start backend. Check the MongoDB connection and DATABASE setting.");
+  console.error(error.message);
+  process.exit(1);
 });

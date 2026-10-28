@@ -8,56 +8,72 @@ const userAuthRouter = Router();
 // SIGNUP
 userAuthRouter.post("/signup", async (req, res) => {
   try {
-    const existingUser = await userDetails.findOne({
-      email: req.body.email,
-    });
-    if(existingUser){
-      res.json({message:"Email already exists"});
+    const email = String(req.body.email || "").trim().toLowerCase();
+    const password = String(req.body.password || "");
+
+    if (!email || !password || !req.body.firstname || !req.body.lastname) {
+      return res.status(400).json({
+        status: "ERROR",
+        message: "Please fill in all required fields",
+      });
     }
-    const newPassword = await bcrypt.hash(req.body.password, 10);
+
+    const existingUser = await userDetails.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({
+        status: "ERROR",
+        message: "Email already exists",
+      });
+    }
+
+    const newPassword = await bcrypt.hash(password, 10);
     await userDetails.create({
-      firstname: req.body.firstname,
-      lastname: req.body.lastname,
-      email: req.body.email,
+      firstname: String(req.body.firstname).trim(),
+      lastname: String(req.body.lastname).trim(),
+      email,
       password: newPassword,
       token: "",
     });
-    res.json({ status: "OK" });
+
+    return res.status(201).json({ status: "OK", message: "Account created successfully" });
   } catch (err) {
     console.log(err);
-    res.json({ status: "ERROR", error: "Duplicate Email" });
+    return res.status(500).json({ status: "ERROR", message: "Unable to create account" });
   }
 });
 
 // LOGIN
 userAuthRouter.post("/login", async (req, res) => {
-  const user = await userDetails.findOne({
-    email: req.body.email,
-    // password: req.body.password,
-  });
-  if (!user) {
-    return { status: "Error", error: "Invalid User" };
-  }
-  const isPasswordValid = await bcrypt.compare(
-    req.body.password,
-    user.password
-  );
-  if (isPasswordValid) {
+  try {
+    const email = String(req.body.email || "").trim().toLowerCase();
+    const password = String(req.body.password || "");
+
+    const user = await userDetails.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ status: "ERROR", message: "Invalid email or password" });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ status: "ERROR", message: "Invalid email or password" });
+    }
+
     const token = jwt.sign(
       {
-        firstname: userDetails.firstname,
-        lastname: userDetails.lastname,
-        email: userDetails.email,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
       },
-      process.env.SECRET_KEY
+      process.env.SECRET_KEY,
+      { expiresIn: "7d" }
     );
-    await userDetails.findOneAndUpdate(
-      { email: req.body.email },
-      { token: token }
-    );
-    return res.json({ status: "OK", user: token });
-  } else {
-    return res.json({ status: "ERROR", user: false });
+
+    await userDetails.findOneAndUpdate({ email }, { token });
+
+    return res.json({ status: "OK", user: token, message: "Login successful" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ status: "ERROR", message: "Unable to login" });
   }
 });
 

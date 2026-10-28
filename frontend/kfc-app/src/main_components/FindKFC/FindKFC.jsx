@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import redLine from "../../assets/svg/redLine.svg"
 import styled from 'styled-components'
 import search from "../../assets/svg/search.svg"
 import setting from "../../assets/svg/setting.svg"
 import data from "./restaurant.json"
 import RestaurantCard from './RestaurantCard'
+
 const FindSearchPartStyled = styled.div`
  text-align: center;
 .findMapPart{
@@ -197,41 +198,52 @@ ${'' /* toggle nav querry */}
 
 }
 `
+
 const FindKFC = () => {
     const [textL, setTextL] = useState("Pune")
-    const [location, setLocation] = useState([])
     const [address, setAddress] = useState("")
 
-    //Geological Location Code for co-ordinates
     const out = (lat, lng) => {
         fetch(`https://us1.locationiq.com/v1/reverse.php?key=pk.456518217705258731c8c7089e3a45d0&lat=${lat}&lon=${lng}&format=json`)
-            .then((e) => e.json())
-            .then((d) => (
-                setAddress(d.display_name),
-                setTextL(d)
-                // ,
-                // console.log(address)
-            ))
+            .then((response) => response.json())
+            .then((data) => {
+                setAddress(data.display_name);
+                setTextL(data.display_name);
+            })
+            .catch((error) => console.error("Location lookup failed:", error));
     }
-    // setTimeout(()=>{
 
-    // },1000)
-    const handleLocation = (el) => ( setTextL(el),setAddress(el) );
-    const findLocat =(event) => { event.preventDefault()};
-    const UseMyGeoLocation = () => { navigator.geolocation.getCurrentPosition(function (position) { out(position.coords.latitude, position.coords.longitude) }) };
+    const handleLocation = (value) => {
+        setTextL(value);
+        setAddress(value);
+    };
+
+    const findLocat = (event) => {
+        event.preventDefault();
+    };
+
+    const UseMyGeoLocation = () => {
+        if (!navigator.geolocation) {
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition((position) => {
+            out(position.coords.latitude, position.coords.longitude);
+        });
+    };
 
     return (
         <FindSearchPartStyled>
             <div className='findMapPart'>
                 <div className='findMapSearch'>
-                    <img className="redLineCss" src={redLine} alt="" />
+                    <img className="redLineCss" src={redLine} alt="red decorative line" />
                     <p style={{ letterSpacing: "1px", fontFamily: "fantasy", fontWeight: "100", fontSize: "32px" }}>Find a KFC Location</p>
                     <p style={{ letterSpacing: "1px", fontFamily: "sans-serif,Roboto", fontWeight: "600", fontSize: "15px" }}>SEARCH BY CITY AND STATE OR ZIP CODE</p>
                     <div className='inputSearchForLocationDiv'>
                         <form onSubmit={findLocat} style={{display:"flex"}} >
                             <input className='inputSearchForLocation' type="text" placeholder="Louisville, KY" onChange={(e) => handleLocation(e.target.value)} />
-                            <img className='inputSearchForLocationImg1' style={{ padding: "0vw 1vw", cursor: "pointer" }} src={search} onClick={()=>handleLocation} alt="" />
-                            <img className='inputSearchForLocationImg2' style={{ padding: "0vw 1vw", cursor: "pointer" }} src={setting} alt="" />
+                            <img className='inputSearchForLocationImg1' style={{ padding: "0vw 1vw", cursor: "pointer" }} src={search} onClick={() => handleLocation(textL)} alt="search icon" />
+                            <img className='inputSearchForLocationImg2' style={{ padding: "0vw 1vw", cursor: "pointer" }} src={setting} alt="settings icon" />
                         </form>
                     </div>
                     <div> <br/>
@@ -242,9 +254,9 @@ const FindKFC = () => {
                         {address ? (
                             <>
                             <div className="browseOurDirectoryAddres"><b>Current Location:</b> {address}</div>
-                            <div className='restaurantCard'>                                
-                                {   
-                                    data.restaurantDetails.map((e)=><RestaurantCard key={e.contact} {...e}/>)
+                            <div className='restaurantCard'>
+                                {
+                                    data.restaurantDetails.map((e) => <RestaurantCard key={e.contact} {...e} />)
                                 }
                             </div>
                             </>
@@ -263,7 +275,6 @@ const FindKFC = () => {
                         allowFullScreen
                         referrerPolicy="no-referrer-when-downgrade"
                         src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAq15HbfCRMW7RqNb5LUNyOLyfzpYI0wl4&q=${textL}`}>
-
                     </iframe>
 
                 </div>

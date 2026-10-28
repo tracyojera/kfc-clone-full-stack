@@ -2,6 +2,8 @@ import React from "react";
 import Slider from "react-slick";
 import SliderData from "../SliderData.json";
 import styles from "./HomeSlider.module.css";
+import { useFallbackImage } from "../utils/imageFallback";
+import { formatUGX } from "../utils/currency";
 
 
 export default class SlickGoTo extends React.Component {
@@ -64,16 +66,24 @@ export default class SlickGoTo extends React.Component {
         </div>
         <Slider ref={(slider) => (this.slider = slider)} {...settings}>
           {SliderData.favorites.map((item) => (
-            <div key={Math.random() * 1000} style={{ outline: "none" }}>
+            <a
+              className={`${styles.itemDiv} ${styles.itemLink}`}
+              href={`/menu#${item.type}`}
+              aria-label={`View ${item.title}`}
+              key={`${item.type}-${item.title}`}
+            >
               <img
                 src={item.image}
-                alt={item.type}
+                onError={useFallbackImage}
+                alt={item.title}
                 className={styles.itemImg}
+                loading="lazy"
+                decoding="async"
               />
               <p className={styles.itemTitle}>{item.title}</p>
-              <p className={styles.itemPrice}>{item.price}</p>
+              <p className={styles.itemPrice}>{formatUGX(item.price)}</p>
               <p className={styles.itemDesc}>{item.desc}</p>
-            </div>
+            </a>
           ))}
         </Slider>
         <progress

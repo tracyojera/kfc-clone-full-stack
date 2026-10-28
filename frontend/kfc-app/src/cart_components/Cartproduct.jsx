@@ -1,73 +1,107 @@
-import React from 'react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import styles from "./cart.module.css"
 import axios from "axios"
-import { useDispatch, useSelector } from 'react-redux'
-import { addcartcount } from '../redux/action'
-import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+import { addcartcount, deleteCart } from '../redux/action'
+import { useFallbackImage } from '../utils/imageFallback'
+import { formatUGX, getPriceAmount, getSafeQuantity } from '../utils/currency'
 
-const Cartproduct = ({desc,id,image,price,qty,title,_id, fetchData}) => {
+const Cartproduct = ({desc,id,image,price,qty,title}) => {
 const dispatch= useDispatch();
-const [count,setCount]= useState(qty);
-let acprice=price.substring(1)
-acprice=Number(acprice);
+const [isUpdating, setIsUpdating] = useState(false);
+const [error, setError] = useState("");
+const acprice = getPriceAmount(price);
+const quantity = getSafeQuantity(qty);
 
-const handleRemove = () =>{
-  axios.delete(`https://kfcapi.herokuapp.com/api/productcart/cart/${id}`)
-  fetchData();
-  console.log("Deleted")
+const handleRemove = async () =>{
+  if (isUpdating) return;
+
+  try {
+    setIsUpdating(true);
+    setError("");
+    await axios.delete(`http://localhost:8081/api/productcart/cart/${id}`);
+    dispatch(deleteCart(id));
+  } catch (requestError) {
+    console.error("Unable to remove cart item:", requestError);
+    setError("Could not remove this item. Please try again.");
+  } finally {
+    setIsUpdating(false);
+  }
+};
+
+const updateQuantity = async (nextQuantity) => {
+  if (isUpdating || nextQuantity < 0) return;
+
+  const item = {
+    id,
+    image,
+    price: acprice,
+    title,
+    desc,
+    qty: nextQuantity
+  };
+
+  try {
+    setIsUpdating(true);
+    setError("");
+    const response = await axios.put(
+      `http://localhost:8081/api/productcart/cart/${id}`,
+      item
+    );
+
+    if (nextQuantity > 0 && !response.data?._id) {
+      throw new Error("Cart item was not found.");
+    }
+
+    dispatch(addcartcount(item));
+  } catch (requestError) {
+    console.error("Unable to update cart item quantity:", requestError);
+    setError(
+      requestError.response?.data?.message ||
+      requestError.message ||
+      "Could not update quantity. Please try again."
+    );
+  } finally {
+    setIsUpdating(false);
+  }
 }
 
   return (
     <div className={styles.cartproductmain} >
         <div className={styles.cartproductleft}>
-            <img src={image} alt="food" />
-            <div>
+            <img src={image} onError={useFallbackImage} alt={title || "food"} />
+            <div className={styles.cartDetails}>
                 <h3>{title}</h3>
                 <ul>
                     <li>{desc}</li>
                 </ul>
-                <h3
-                style={{cursor:'pointer'}}
+                <button
+                className={styles.removeButton}
+                type="button"
+                disabled={isUpdating}
                 onClick={handleRemove}
-                >Remove</h3>
+                >Remove</button>
             </div>
         </div>
         <div className={styles.cartproductright} >
-            
-                <button disabled={qty==1||count==1}
-                onClick={()=>{
-                  const el={
-                    id:id,image,price,title,desc,qty:count-1
-                  }
-                  axios.put(`https://kfcapi.herokuapp.com/api/productcart/cart/${id}`,el)
-                  .then(({data})=>{
-                    dispatch(addcartcount(el));
-                    setCount(count-1);
-                    
-                  })
-                }
-                }
-                >&#8211;</button>
-                <h4>{count}</h4>
+          <div className={styles.quantityControl}>
                 <button
-                onClick={()=>{
-                  
-                  
-                const el={
-                id:id,image,price,title,desc,qty:count+1
-                }
-                axios.put(`https://kfcapi.herokuapp.com/api/productcart/cart/${id}`,el)
-               .then(({data})=>{
-                setCount(count+1)
-                dispatch(addcartcount(el));
-                })
-                }}
-                
+                type="button"
+                aria-label={`Remove one ${title || "item"}`}
+                disabled={isUpdating || quantity === 0}
+                onClick={()=>updateQuantity(quantity - 1)}
+                >&#8211;</button>
+                <span aria-live="polite">{quantity}</span>
+                <button
+                type="button"
+                aria-label={`Add one ${title || "item"}`}
+                disabled={isUpdating}
+                onClick={()=>updateQuantity(quantity + 1)}
                 >&#43;</button>
-                <h3>{Math.round(acprice*count)}</h3>
-            
+          </div>
+          <h3 className={styles.cartAmount}>{formatUGX(acprice * quantity)}</h3>
         </div>
+        {error && <p className={styles.cartUpdateError} role="alert">{error}</p>}
     </div>
   )
 }

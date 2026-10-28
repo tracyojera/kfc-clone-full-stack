@@ -1,6 +1,17 @@
 const { Router } = require("express");
+const mongoose = require("mongoose");
 const Cart = require("../model/cartSchema");
 const cartRouter = Router();
+
+const findCartItem = async (id) => {
+  let item = await Cart.findOne({ id });
+
+  if (!item && mongoose.Types.ObjectId.isValid(id)) {
+    item = await Cart.findById(id);
+  }
+
+  return item;
+};
 
 cartRouter.post("/cart", async (req, res) => {
   await Cart.insertMany(req.body);
@@ -13,17 +24,33 @@ cartRouter.get("/cart", async (req, res) => {
 });
 
 cartRouter.delete("/cart/:id", async (req, res) => {
-  await Cart.deleteOne(req.params);
-  res.send("delete successful");
+  const item = await findCartItem(req.params.id);
+  if (!item) {
+    return res.status(404).json({ message: "Cart item was not found." });
+  }
+
+  await Cart.deleteOne({ _id: item._id });
+  return res.send("delete successful");
 });
 
 cartRouter.put("/cart/:id", async (req, res) => {
-  if (req.body.qty === 0) {
-    await Cart.deleteOne(req.params);
-    return res.send("cart is empty");
+  const { qty } = req.body;
+  if (!Number.isInteger(qty) || qty < 0) {
+    return res.status(400).json({ message: "Quantity must be a non-negative integer." });
   }
-  await Cart.updateOne(req.params, { $set: req.body });
-  let cart = await Cart.find(req.params);
-  return res.json(cart);
+
+  const item = await findCartItem(req.params.id);
+  if (!item) {
+    return res.status(404).json({ message: "Cart item was not found." });
+  }
+
+  if (qty === 0) {
+    await Cart.deleteOne({ _id: item._id });
+    return res.json({ deleted: true, id: req.params.id });
+  }
+
+  item.qty = qty;
+  await item.save();
+  return res.json(item);
 });
 module.exports = cartRouter;

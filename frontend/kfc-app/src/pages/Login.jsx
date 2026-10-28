@@ -31,30 +31,35 @@ const Login = () => {
 
   async function loginUser(event) {
     event.preventDefault();
-    const response = await fetch("https://kfcapi.herokuapp.com/Auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    });
-    const data = await response.json();
-    if (data.user) {
-      localStorage.setItem("token", data.user);
-      // notify();
-      alert("Login Successful")
-      const timer = setTimeout(() => {
-        navigate("/");
-      }, 2000);
-      return () => clearTimeout(timer);
-    } else {
-      // notify2();
-      alert("Please check Email or Password")
+
+    try {
+      const response = await fetch("http://localhost:8081/Auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.status === "OK" && data.user) {
+        localStorage.setItem("token", data.user);
+        alert(data.message || "Login Successful");
+        const timer = setTimeout(() => {
+          navigate("/");
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
+
+      alert(data.message || "Please check Email or Password");
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Unable to log in right now. Please try again.");
     }
-    console.log("data:", data);
   }
 
   return (
@@ -134,7 +139,6 @@ const Login = () => {
 };
 
 export default Login;
-
 
 
 

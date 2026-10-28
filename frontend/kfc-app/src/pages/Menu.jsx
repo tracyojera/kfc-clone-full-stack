@@ -1,19 +1,6 @@
-import React from 'react'
-import { MenuItem } from '../menu_components/MenuItems'
-import { Sidebar } from '../menu_components/Sidebar'
-// import { FixedNavbar } from '../main_components/navbar/FixedNavbar'
-import styles from "./Menu.module.css"
+import React from "react";
+import { MenuItem } from "../menu_components/MenuItems";
 
+const Menu = () => <MenuItem />;
 
-const Menu = () => {
-  // <FixedNavbar/>
-  return (
-    
-    <div className={styles.menumain} >
-        <Sidebar/>
-        <MenuItem/>
-    </div>
-  )
-}
-
-export default Menu
+export default Menu;

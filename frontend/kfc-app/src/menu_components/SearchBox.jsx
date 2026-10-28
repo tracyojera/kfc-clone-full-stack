@@ -1,29 +1,16 @@
-import React from 'react'
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import React from "react";
 import styles from "./item.module.css";
 
-const SearchBox = () => {
-const [searchval,setSearchval]= useState("");
-const navigate= useNavigate();
-  return (
-    <div className={styles.searchbox} >
-     
-       <input type="text" 
-       value={searchval} 
-       placeholder="Search Our Menu"
-       onChange={(e)=>setSearchval(e.target.value)}
-       onKeyUp={(e)=>{
-        if(e.code=='Enter'){
-            localStorage.setItem("search",searchval);
-            navigate("/search")
-        }
-        
-       }}
-       />
+const SearchBox = ({ value, onChange }) => (
+  <div className={styles.searchbox}>
+    <input
+      type="search"
+      value={value}
+      placeholder="Search Our Menu"
+      aria-label="Search menu"
+      onChange={(event) => onChange(event.target.value)}
+    />
+  </div>
+);
 
-    </div>
-  )
-}
-
-export default SearchBox
+export default SearchBox;

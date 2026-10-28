@@ -229,7 +229,7 @@ export const Footer = () => {
                             </div>
                         </div>
                         <div className='lastLinefoot'>
-                            <p>Copyright © KFC Corporation 2022 All Rights Reserved</p>
+                            <p>Copyright © KFC Corporation 2022 All Rights Reserved - BUILT BY ABER TRACY OJERA(S25D14/007) AND AKANKUNDA MERCY(S25D14/005) </p>
                         </div>
                         <div style={{ display: "flex" }} className='lastLinefoot'>
                             <Link to={"https://www.instagram.com/_mad___boxer_/"}><img height={"30rem"} style={{ padding: "0.3vw 1vw" }} src={instagram} alt="" /></Link>

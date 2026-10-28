@@ -63,20 +63,34 @@ switch(type){
         }
       }
       case ADDCART:{
+        const existingItem = state.cart.find(
+          (item) => String(item.id) === String(payload.id)
+        );
+
+        if (existingItem) {
+          return {
+            ...state,
+            cart: state.cart.map((item) =>
+              String(item.id) === String(payload.id)
+                ? { ...item, ...payload }
+                : item
+            )
+          };
+        }
+
         return{
           ...state,cart:[...state.cart,payload]
         }
       }
       case CARTCOUNT:{
-        for(let i=0;i<state.cart.length;i++){
-          if(state.cart[i].id===payload.id){
-            state.cart[i].qty=payload.qty;
-            if(state.cart[i].qty==0){
-              state.cart.splice(i,1);
-            }
-          }
-        }
-        let cart=[...state.cart]
+        const cart = payload.qty === 0
+          ? state.cart.filter((item) => String(item.id) !== String(payload.id))
+          : state.cart.map((item) =>
+              String(item.id) === String(payload.id)
+                ? { ...item, ...payload }
+                : item
+            );
+
         return{
           ...state,cart:cart
         }
@@ -87,14 +101,9 @@ switch(type){
           }
       }
       case DELETECART:{
-        for(let i=0;i<state.cart.length;i++){
-          if(state.cart[i].id===payload){
-            state.cart.splice(i,1);
-          }
-        }
-        let cart=[...state.cart]
           return{
-            ...state,cart:cart
+            ...state,
+            cart: state.cart.filter((item) => String(item.id) !== String(payload))
           }
       }
     default :return state;

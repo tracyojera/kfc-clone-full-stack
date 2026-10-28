@@ -1,27 +1,31 @@
 
 import { addsnacks } from '../redux/action';
 import { getdata } from "../utils/getdata"
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import styles from "./item.module.css"
 import Item from './Item';
+import filterCartProducts from "./filterCartProducts"
 const Snacks = () => {
     const dispatch = useDispatch();
-    const snacks= useSelector((state)=>state.snacks);
-    useEffect(()=>{
+    const snacks = useSelector((state)=>state.snacks);
+    const cart = useSelector((state)=>state.cart);
+    const cartSnacks = filterCartProducts(snacks, cart);
+
+    const fetchData = useCallback(async () => {
+        const payload = await getdata("http://localhost:8081/api/product/menu?type=snacks");
+        dispatch(addsnacks(payload));
+    }, [dispatch]);
+
+    useEffect(() => {
         fetchData();
-    },[])
-    
-     const fetchData= async()=>{
-        let payload= await getdata("https://kfcapi.herokuapp.com/api/product/menu?type=snacks");
-         dispatch(addsnacks(payload));
-     }
+    }, [fetchData]);
 
   return (
   <div id="snacks">
     <h1>SNACKS</h1>
    <div className={styles.itembox} >
-    {snacks.map((el)=>{
+    {cartSnacks.map((el)=>{
       return <Item {...el} key={el._id}  />
     })}
    </div>

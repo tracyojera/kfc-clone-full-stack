@@ -1,0 +1,6 @@
+$kind: http-request
+name: http://localhost:8081/api/product/menu
+description: ""
+url: http://localhost:8081/api/product/menu
+method: GET
+order: 4246528330041380

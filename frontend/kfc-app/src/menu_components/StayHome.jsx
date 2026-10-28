@@ -1,27 +1,31 @@
 
 import { addstayhome } from '../redux/action';
 import { getdata } from "../utils/getdata"
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import styles from "./item.module.css"
 import Item from './Item';
+import filterCartProducts from "./filterCartProducts"
 const StayHome = () => {
-  const stayhome= useSelector((state)=>state.stayhome);
-  const dispatch= useDispatch();
-    useEffect(()=>{
-        fetchData();
-    },[])
-    
-     const fetchData= async()=>{
-        let payload= await getdata("https://kfcapi.herokuapp.com/api/product/menu?type=stayhome");
-         dispatch(addstayhome(payload));
-     }
+  const stayhome = useSelector((state)=>state.stayhome);
+  const cart = useSelector((state)=>state.cart);
+  const cartStayHome = filterCartProducts(stayhome, cart);
+  const dispatch = useDispatch();
+
+  const fetchData = useCallback(async () => {
+      const payload = await getdata("http://localhost:8081/api/product/menu?type=stayhome");
+      dispatch(addstayhome(payload));
+  }, [dispatch]);
+
+  useEffect(() => {
+      fetchData();
+  }, [fetchData]);
 
   return (
   <div id="stayhome">
     <h1>STAY HOME SPECIALS</h1>
    <div className={styles.itembox} >
-    {stayhome.map((el)=>{
+    {cartStayHome.map((el)=>{
       return <Item {...el} key={el._id}  />
     })}
    </div>

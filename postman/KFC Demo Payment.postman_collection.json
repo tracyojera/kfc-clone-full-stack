@@ -1,0 +1,114 @@
+{
+  "info": {
+    "_postman_id": "0d52727d-b3e7-4d30-8a3a-42e84ea90a1e",
+    "name": "KFC Demo Payment",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Successful demo payment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 100\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8081/api/payment/pay",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "api",
+            "payment",
+            "pay"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('returns HTTP 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('returns a demo payment confirmation', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.status).to.eql('OK');",
+              "    pm.expect(body.message).to.eql('Payment successful');",
+              "    pm.expect(body.paymentId).to.match(/^KFC-[A-F0-9]{12}$/);",
+              "    pm.expect(body.amount).to.eql(100);",
+              "    pm.expect(body.currency).to.eql('UGX');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reject zero payment amount",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 0\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8081/api/payment/pay",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "api",
+            "payment",
+            "pay"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('returns HTTP 400', function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "pm.test('returns the invalid amount message', function () {",
+              "    pm.expect(pm.response.json().message).to.eql('Invalid payment amount');",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

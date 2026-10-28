@@ -1,28 +1,31 @@
-import React from 'react'
-import { useEffect } from 'react';
-import { useDispatch ,useSelector} from 'react-redux'
+import React, { useCallback, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { addbeverages } from '../redux/action';
 import { getdata } from '../utils/getdata';
 import styles from "./item.module.css"
 import Item from './Item';
+import filterCartProducts from "./filterCartProducts"
 
 const Beverages = () => {
  const dispatch = useDispatch();
- const beverage= useSelector((state)=>state.beverages); 
-useEffect(()=>{
-    fetchData();
-},[])
+ const beverage = useSelector((state) => state.beverages);
+ const cart = useSelector((state)=>state.cart);
+ const cartBeverages = filterCartProducts(beverage, cart);
 
- const fetchData= async()=>{
-    let payload= await getdata("https://kfcapi.herokuapp.com/api/product/menu?type=beverages");
-     dispatch(addbeverages(payload));
- }
+ const fetchData = useCallback(async () => {
+    const payload = await getdata("http://localhost:8081/api/product/menu?type=beverages");
+    dispatch(addbeverages(payload));
+ }, [dispatch]);
+
+ useEffect(() => {
+    fetchData();
+ }, [fetchData]);
 
   return (
   <div id="beverage" >
     <h1>BEVERAGES</h1>
    <div className={styles.itembox} >
-    {beverage.map((el)=>{
+    {cartBeverages.map((el)=>{
       return <Item {...el} key={el._id}  />
     })}
    </div>

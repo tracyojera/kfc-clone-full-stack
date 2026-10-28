@@ -1,0 +1,9 @@
+$kind: http-request
+name: http://localhost:8081/api/productcart/cart/6ac4b785e8dd699e82a9d7a0
+description: ""
+url: http://localhost:8081/api/productcart/cart/6ac4b785e8dd699e82a9d7a0
+method: PUT
+body:
+  type: json
+  content: "{\r\n  \"qty\": 4\r\n}"
+order: 4503392881322360

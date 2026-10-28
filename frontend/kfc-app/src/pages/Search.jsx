@@ -7,14 +7,15 @@ import styles from "./Menu.module.css";
 
 
 const Search = () => {
-const [search,setSearch]= useState([]);
-let val= localStorage.getItem("search");
-useEffect(()=>{
-    axios.get(`https://kfcapi.herokuapp.com/api/searchapi/item/?search=${val}`)
+const [search, setSearch] = useState([]);
+const val = localStorage.getItem("search") || "";
+
+useEffect(() => {
+    axios.get(`http://localhost:8081/api/searchapi/item/?search=${val}`)
     .then(({data})=>{
         setSearch(data)
     })
-},[])
+}, [val])
 
 
   return (

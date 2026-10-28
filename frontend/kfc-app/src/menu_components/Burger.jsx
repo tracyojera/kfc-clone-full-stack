@@ -1,27 +1,31 @@
 
 import { addburger } from '../redux/action';
 import { getdata } from "../utils/getdata"
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import styles from "./item.module.css"
 import Item from './Item';
+import filterCartProducts from "./filterCartProducts"
 const Burger = () => {
     const dispatch = useDispatch();
-    const burger= useSelector((state)=>state.burger);
-    useEffect(()=>{
+    const burger = useSelector((state)=>state.burger);
+    const cart = useSelector((state)=>state.cart);
+    const cartBurger = filterCartProducts(burger, cart);
+
+    const fetchData = useCallback(async () => {
+        const payload = await getdata("http://localhost:8081/api/product/menu?type=burger");
+        dispatch(addburger(payload));
+    }, [dispatch]);
+
+    useEffect(() => {
         fetchData();
-    },[])
-    
-     const fetchData= async()=>{
-        let payload= await getdata("https://kfcapi.herokuapp.com/api/product/menu?type=burger");
-         dispatch(addburger(payload));
-     }
+    }, [fetchData]);
 
   return (
   <div id="burger">
     <h1>BURGERS</h1>
    <div className={styles.itembox} >
-    {burger.map((el)=>{
+    {cartBurger.map((el)=>{
       return <Item {...el} key={el._id}  />
     })}
    </div>

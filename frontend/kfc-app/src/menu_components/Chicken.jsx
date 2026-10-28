@@ -1,31 +1,38 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
-import { addchicken } from '../redux/action';
-import { getdata } from "../utils/getdata"
-import Item from './Item';
-import styles from "./item.module.css"
+import React, { useCallback, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addchicken } from "../redux/action";
+import { getdata } from "../utils/getdata";
+import Item from "./Item";
+import filterCartProducts from "./filterCartProducts";
+import styles from "./item.module.css";
+
 const Chicken = () => {
-    const dispatch = useDispatch();
-    const chicken= useSelector((state)=>state.chicken);
-    useEffect(()=>{
-        fetchData();
-    },[])
-     const fetchData= async()=>{
-        let payload= await getdata("https://kfcapi.herokuapp.com/api/product/menu?type=chicken");
-         dispatch(addchicken(payload));
-     }
-  
+  const dispatch = useDispatch();
+  const chicken = useSelector((state) => state.chicken);
+  const cart = useSelector((state) => state.cart);
+  const cartChicken = filterCartProducts(chicken, cart);
+
+  const fetchData = useCallback(async () => {
+    const payload = await getdata(
+      "http://localhost:8081/api/product/menu?type=chicken"
+    );
+    dispatch(addchicken(payload));
+  }, [dispatch]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   return (
-    <div id="chicken" >
+    <section id="chicken">
       <h1>CHICKEN BUCKETS</h1>
-     <div className={styles.itembox} >
-      {chicken.map((el)=>{
-        return <Item {...el} key={el._id}  />
-      })}
-     </div>
-    </div>
+      <div className={styles.itembox}>
+        {cartChicken.map((item) => (
+          <Item {...item} key={item._id} />
+        ))}
+      </div>
+    </section>
+  );
+};
 
-  )
-}
-
-export default Chicken
+export default Chicken;

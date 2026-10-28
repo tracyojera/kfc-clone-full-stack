@@ -1,27 +1,32 @@
 
 import { addrolls } from '../redux/action';
 import { getdata } from "../utils/getdata"
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import styles from "./item.module.css"
 import Item from './Item';
+import filterCartProducts from "./filterCartProducts"
 
 const Rolls = () => {
     const dispatch = useDispatch();
-    const rolls= useSelector((state)=>state.rolls)
-    useEffect(()=>{
+    const rolls = useSelector((state)=>state.rolls)
+    const cart = useSelector((state)=>state.cart);
+    const cartRolls = filterCartProducts(rolls, cart);
+
+    const fetchData = useCallback(async () => {
+        const payload = await getdata("http://localhost:8081/api/product/menu?type=rolls");
+        dispatch(addrolls(payload));
+    }, [dispatch]);
+
+    useEffect(() => {
         fetchData();
-    },[])
-    
-     const fetchData= async()=>{
-        let payload= await getdata("https://kfcapi.herokuapp.com/api/product/menu?type=rolls");
-         dispatch(addrolls(payload));
-     }
+    }, [fetchData]);
+
   return (
     <div id="rolls">
       <h1>CHICKEN ROLLS</h1>
      <div className={styles.itembox} >
-      {rolls.map((el)=>{
+      {cartRolls.map((el)=>{
         return <Item {...el} key={el._id}  />
       })}
      </div>

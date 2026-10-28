@@ -5,7 +5,8 @@ const menuSchema= new Schema({
     title:String,
     desc:String,
     price:String,
-    type:String
+    type:String,
+   
 })
 
 const Menu= model("menu",menuSchema)

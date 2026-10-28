@@ -7,14 +7,15 @@ import SingleItem from '../menu_components/SingleItem';
 
 
 const SingleProduct = () => {
-    const {id}= useParams();
-    const [single,setsingle]= useState([]);
-    useEffect(()=>{
-      axios.get(`https://kfcapi.herokuapp.com/api/product/menu/${id}`)
+    const { id } = useParams();
+    const [single, setsingle] = useState([]);
+
+    useEffect(() => {
+      axios.get(`http://localhost:8081/api/product/menu/${id}`)
       .then(({data})=>{
         setsingle(data)
       })
-    },[])
+    }, [id])
     
   return (
     <div style={{marginTop:"70px",marginBottom:"70px"}} >

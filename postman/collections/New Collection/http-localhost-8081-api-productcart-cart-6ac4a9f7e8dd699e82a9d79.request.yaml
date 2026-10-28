@@ -1,0 +1,6 @@
+$kind: http-request
+name: http://localhost:8081/api/productcart/cart/6ac4a9f7e8dd699e82a9d790
+description: ""
+url: http://localhost:8081/api/productcart/cart/6ac4a9f7e8dd699e82a9d790
+method: DELETE
+order: 4503392881321360
