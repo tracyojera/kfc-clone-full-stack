@@ -16,8 +16,12 @@ const PORT = process.env.PORT || 8081;
 server.use(express.urlencoded({ extended: true }));
 server.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3001"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "https://kfc-clone-full-stack-frontend.vercel.app",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   })
 );
 server.use(helmet());
