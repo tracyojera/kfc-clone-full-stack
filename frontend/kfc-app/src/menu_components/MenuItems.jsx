@@ -70,7 +70,7 @@ const MenuItem = () => {
     try {
       setLoading(true);
       setError("");
-      const items = await getdata("http://localhost:8081/api/product/menu");
+      const items = await getdata("https://kfc-clone-full-stack-1.onrender.com/api/product/menu");
 
       if (!Array.isArray(items)) {
         throw new Error("The menu API did not return a product list.");
@@ -89,7 +89,7 @@ const MenuItem = () => {
     try {
       setCartReady(false);
       setCartError("");
-      const items = await getdata("http://localhost:8081/api/productcart/cart");
+      const items = await getdata("https://kfc-clone-full-stack-1.onrender.com/api/productcart/cart");
 
       if (!Array.isArray(items)) {
         throw new Error("The cart API did not return a cart list.");

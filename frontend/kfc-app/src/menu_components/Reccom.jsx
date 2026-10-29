@@ -10,7 +10,7 @@ import { getMenuImage } from '../utils/menuImages'
 const Reccom = () => {
     let [recom,setrecom]= useState([]);
     useEffect(()=>{
-      axios.get("http://localhost:8081/api/searchapi/item/?search=classic")
+      axios.get("https://kfc-clone-full-stack-1.onrender.com/api/searchapi/item/?search=classic")
       .then(({data})=>{
         setrecom(data);
       })

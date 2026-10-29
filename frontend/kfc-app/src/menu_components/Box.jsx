@@ -14,7 +14,7 @@ const Box = () => {
     const cartBox = filterCartProducts(box, cart);
 
     const fetchData = useCallback(async () => {
-        const payload = await getdata("http://localhost:8081/api/product/menu?type=boxmeals");
+        const payload = await getdata("https://kfc-clone-full-stack-1.onrender.com/api/product/menu?type=boxmeals");
         dispatch(addbox(payload));
     }, [dispatch]);
 

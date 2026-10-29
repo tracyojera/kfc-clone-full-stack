@@ -11,7 +11,7 @@ const SingleProduct = () => {
     const [single, setsingle] = useState([]);
 
     useEffect(() => {
-      axios.get(`http://localhost:8081/api/product/menu/${id}`)
+      axios.get(`https://kfc-clone-full-stack-1.onrender.com/api/product/menu/${id}`)
       .then(({data})=>{
         setsingle(data)
       })

@@ -33,7 +33,7 @@ const Login = () => {
     event.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8081/Auth/login", {
+      const response = await fetch("https://kfc-clone-full-stack-1.onrender.com/Auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

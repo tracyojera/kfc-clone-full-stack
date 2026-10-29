@@ -27,7 +27,7 @@ const SignUp = () => {
     event.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8081/Auth/signup", {
+      const response = await fetch("https://kfc-clone-full-stack-1.onrender.com/Auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -33,7 +33,7 @@ const SingleItem = ({ _id, image, price, title, desc }) => {
     try {
       setIsUpdating(true);
       setError("");
-      await axios.post("http://localhost:8081/api/productcart/cart", item);
+      await axios.post("https://kfc-clone-full-stack-1.onrender.com/api/productcart/cart", item);
       dispatch(addcart(item));
     } catch (requestError) {
       console.error("Unable to add menu item to cart:", requestError);
@@ -59,7 +59,7 @@ const SingleItem = ({ _id, image, price, title, desc }) => {
       setIsUpdating(true);
       setError("");
       const response = await axios.put(
-        `http://localhost:8081/api/productcart/cart/${_id}`,
+        `https://kfc-clone-full-stack-1.onrender.com/api/productcart/cart/${_id}`,
         item
       );
 

@@ -13,7 +13,7 @@ const StayHome = () => {
   const dispatch = useDispatch();
 
   const fetchData = useCallback(async () => {
-      const payload = await getdata("http://localhost:8081/api/product/menu?type=stayhome");
+      const payload = await getdata("https://kfc-clone-full-stack-1.onrender.com/api/product/menu?type=stayhome");
       dispatch(addstayhome(payload));
   }, [dispatch]);
 

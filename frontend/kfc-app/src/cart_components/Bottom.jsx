@@ -8,7 +8,7 @@ const Bottom = () => {
   let [recom, setrecom] = useState([]);
   useEffect(() => {
     axios
-      .get("http://localhost:8081/api/searchapi/item/?search=meal")
+      .get("https://kfc-clone-full-stack-1.onrender.com/api/searchapi/item/?search=meal")
       .then(({ data }) => {
         setrecom(data);
       });

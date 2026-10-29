@@ -14,7 +14,7 @@ const Biryani = () => {
     const cartBiryani = filterCartProducts(biryani, cart);
 
     const fetchData = useCallback(async () => {
-        const payload = await getdata("http://localhost:8081/api/product/menu?type=biryani");
+        const payload = await getdata("https://kfc-clone-full-stack-1.onrender.com/api/product/menu?type=biryani");
         dispatch(addbiryani(payload));
     }, [dispatch]);
 

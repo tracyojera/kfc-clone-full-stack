@@ -13,7 +13,7 @@ const Beverages = () => {
  const cartBeverages = filterCartProducts(beverage, cart);
 
  const fetchData = useCallback(async () => {
-    const payload = await getdata("http://localhost:8081/api/product/menu?type=beverages");
+    const payload = await getdata("https://kfc-clone-full-stack-1.onrender.com/api/product/menu?type=beverages");
     dispatch(addbeverages(payload));
  }, [dispatch]);
 

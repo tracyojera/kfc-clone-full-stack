@@ -11,7 +11,7 @@ const [search, setSearch] = useState([]);
 const val = localStorage.getItem("search") || "";
 
 useEffect(() => {
-    axios.get(`http://localhost:8081/api/searchapi/item/?search=${val}`)
+    axios.get(`https://kfc-clone-full-stack-1.onrender.com/api/searchapi/item/?search=${val}`)
     .then(({data})=>{
         setSearch(data)
     })

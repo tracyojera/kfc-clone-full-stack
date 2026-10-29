@@ -11,7 +11,7 @@ const Leftside = () => {
     const cart = useSelector((state) => state.cart);
 
     const fetchdata = useCallback(async () => {
-      const payload = await getdata("http://localhost:8081/api/productcart/cart");
+      const payload = await getdata("https://kfc-clone-full-stack-1.onrender.com/api/productcart/cart");
       dispatch(getCart(payload.map((item) => ({
         ...item,
         id: item.id || item._id

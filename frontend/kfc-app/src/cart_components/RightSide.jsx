@@ -36,7 +36,7 @@ const RightSide = () => {
       try {
         const amount = stotal + (input ? 5 : 0);
         const { data } = await axios.post(
-          "http://localhost:8081/api/payment/pay",
+          "https://kfc-clone-full-stack-1.onrender.com/api/payment/pay",
           { amount }
         );
         setPaymentMessage(`${data.message}. Payment ID: ${data.paymentId}`);

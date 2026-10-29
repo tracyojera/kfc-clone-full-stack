@@ -19,7 +19,7 @@ const handleRemove = async () =>{
   try {
     setIsUpdating(true);
     setError("");
-    await axios.delete(`http://localhost:8081/api/productcart/cart/${id}`);
+    await axios.delete(`https://kfc-clone-full-stack-1.onrender.com/api/productcart/cart/${id}`);
     dispatch(deleteCart(id));
   } catch (requestError) {
     console.error("Unable to remove cart item:", requestError);
@@ -45,7 +45,7 @@ const updateQuantity = async (nextQuantity) => {
     setIsUpdating(true);
     setError("");
     const response = await axios.put(
-      `http://localhost:8081/api/productcart/cart/${id}`,
+      `https://kfc-clone-full-stack-1.onrender.com/api/productcart/cart/${id}`,
       item
     );
 
